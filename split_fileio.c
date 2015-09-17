@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define TEXT_SIZE 1000
-#define AMOUNT_OF_WORDS 100
+#define TEXT_SIZE 100000000
+#define AMOUNT_OF_WORDS 1000000
 #define AMOUNT_OF_SPLITTERS 100
 #define MAX_WORD_SIZE 100
 
@@ -15,6 +15,7 @@ int split(char* str, char* spl, int amount_of_spl, char** res)
 	int is_ended = 0;
 	for (i = 0; i < strlen(str); i++)
 	{
+		fprintf(stderr, "%d\n", i);
 		int is_splitter = 0;
 		for (j = 0; j < amount_of_spl; j++)
 		{
@@ -59,7 +60,8 @@ int main()
 	FILE * outFile = fopen("split.out", "w");
 
 	str = (char*)malloc(sizeof(char)*TEXT_SIZE);
-	fgets(str, TEXT_SIZE, textFile);
+//	fgets(str, TEXT_SIZE, textFile);
+	fread(str, sizeof(char), TEXT_SIZE, textFile);
 	spl = (char*)malloc(sizeof(char)*(n+2));
 	spl[0] = ' ';
 	spl[1] = '\n';
@@ -74,8 +76,9 @@ int main()
 	am_of_words = split(str, spl, n+2, res_arr);
 
 	for(i = 0; i < am_of_words; i++)
-		printf("%s\n", res_arr[i]); 
-	
+	{
+		fprintf(outFile, "%s\n", res_arr[i]); 
+	}
 	fclose(textFile);
 	fclose(splFile);
 	fclose(outFile);
