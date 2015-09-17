@@ -4,6 +4,7 @@
 
 #define TEXT_SIZE 1000
 #define AMOUNT_OF_WORDS 100
+#define AMOUNT_OF_SPLITTERS 100
 #define MAX_WORD_SIZE 100
 
 int split(char* str, char* spl, int amount_of_spl, char** res)
@@ -49,16 +50,20 @@ int split(char* str, char* spl, int amount_of_spl, char** res)
 
 int main()
 {
-	int n, i = 0;
+	int i = 0, n = 100;
 	char* str;
 	char* spl;
+
+	FILE * textFile = fopen("text", "r");
+	FILE * splFile = fopen("splitters.txt", "r");
+	FILE * outFile = fopen("split.out", "w");
+
 	str = (char*)malloc(sizeof(char)*TEXT_SIZE);
-	fgets(str, TEXT_SIZE, stdin);
-	scanf("%d", &n);
+	fgets(str, TEXT_SIZE, textFile);
 	spl = (char*)malloc(sizeof(char)*(n+2));
 	spl[0] = ' ';
 	spl[1] = '\n';
-	scanf("%s", spl+2); //разделители вводятся подряд без пробелов
+	fgets(spl+2, n, splFile); //разделители вводятся подряд без пробелов
 
 	char **res_arr;
 	res_arr = (char**)malloc(sizeof(char*)*AMOUNT_OF_WORDS);
@@ -70,6 +75,10 @@ int main()
 
 	for(i = 0; i < am_of_words; i++)
 		printf("%s\n", res_arr[i]); 
+	
+	fclose(textFile);
+	fclose(splFile);
+	fclose(outFile);
 
 	free(str);
 	free(spl);
