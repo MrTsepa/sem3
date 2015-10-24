@@ -6,9 +6,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <semaphore.h>
 
-#define SLEEP_TIME 10
-#define MAX_THREAD_NUMBER 2
+#define SLEEP_TIME 20
+#define MAX_THREAD_NUMBER 0
 
 int msqid;
 int thread_number = 0;
@@ -31,6 +32,10 @@ struct SndMsg {
 
 void *thread_func(void *RcvBuf)
 {
+	thread_number++;
+
+	printf("Executing task of pid %d\n", ((struct RcvMsg*)RcvBuf)->info.pid);
+
 	struct SndMsg SndBuf;
 	int snd_len = sizeof(SndBuf.info);
 
@@ -48,6 +53,8 @@ void *thread_func(void *RcvBuf)
 				SndBuf.mtype, SndBuf.info.res);
 	}
 	
+	thread_number--;
+
 	printf("	Waiting to recieve...\n");
 	
 	return NULL;
@@ -91,9 +98,8 @@ while(1)
 	}
 
 	pthread_t thread;
-
-	if (pthread_create(&thread, NULL, thread_func, (void*)&RcvBuf) != 0)
-	{
+	
+	if (pthread_create(&thread, NULL, thread_func, (void*)&RcvBuf) != 0) {
 		return EXIT_FAILURE;
 	}
 }

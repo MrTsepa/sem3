@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <semaphore.h>
 
 /* Тип сообщения для прекращения работы программы 2 */
 #define LAST_MESSAGE 255 
@@ -44,8 +45,8 @@ int main()
 		exit(-1);
 	}
 
-	int a, b;
-	scanf("%d %d", &a, &b);
+	int a = 2, b = 3;
+//	scanf("%d %d", &a, &b);
 
 	SndBuf.mtype = 1;
 	SndBuf.info.a = a;
@@ -63,7 +64,11 @@ int main()
 				SndBuf.mtype, SndBuf.info.a, SndBuf.info.b,
 				SndBuf.info.pid);
 	}
-	
+
+	sem_t *sem;
+	sem = sem_open("/my_sem", 0);
+	sem_post(sem);
+
 	printf("	Waiting to recieve...\n");
 
 	len = sizeof(RcvBuf.info);
