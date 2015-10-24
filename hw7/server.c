@@ -32,6 +32,11 @@ struct SndMsg {
 
 void *thread_func(void *RcvBuf)
 {
+  /*
+   * FIXIT:
+   * как мы уже убеждались, операция инкрементации неатомарная, поэтому не исключено состояние гонки.
+   * надо обеспеспечить её атомарность.
+   */
 	thread_number++;
 
 	printf("Executing task of pid %d\n", ((struct RcvMsg*)RcvBuf)->info.pid);
@@ -53,6 +58,9 @@ void *thread_func(void *RcvBuf)
 				SndBuf.mtype, SndBuf.info.res);
 	}
 	
+	/*
+   * FIXIT: та же беда, что и с инкрементацией выше.
+   */
 	thread_number--;
 
 	printf("	Waiting to recieve...\n");
@@ -67,6 +75,10 @@ int main()
 
 	int i;
 
+  /*
+   * FIXIT:
+   * у вас все переменные названы со строчной буквы, а следующие две почему-то с заглавной. поправьте.
+   */
 	struct SndMsg SndBuf;
 	struct RcvMsg RcvBuf;
 	int rcv_len = sizeof(RcvBuf.info);
@@ -82,6 +94,9 @@ int main()
 		exit(-1);
 	}
 
+/*
+ * Что с форматироваем стало?
+ */
 while(1)
 {
 	printf("	Waiting to recieve...\n");
@@ -99,6 +114,11 @@ while(1)
 
 	pthread_t thread;
 	
+  /*
+   * FIXIT: вы передаёте в ф-ю потока указатель на одну и ту же переменную RcvBuf,
+   * которая на следующей итерации цикла уже изменится, что в общем случае приведёт к неверной работе программы.
+   * Нужно обеспечить ситуацию, когда внутри каждой ф-и будет своя RcvBuf, которая не изменится в течение всей работы нити.
+   */
 	if (pthread_create(&thread, NULL, thread_func, (void*)&RcvBuf) != 0) {
 		return EXIT_FAILURE;
 	}
