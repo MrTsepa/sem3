@@ -5,10 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <semaphore.h>
 
-/* Тип сообщения для прекращения работы программы 2 */
-#define LAST_MESSAGE 255 
+#define LAST_MESSAGE 255
 
 int main()
 {
@@ -25,7 +23,7 @@ int main()
  * А при компиляции писать gcc client.c mytypes.h -o client,
  * т.е. указывать все "причастные файлы".
  */
-  
+
 	struct SndMsg {
 		long mtype;
 		struct {
@@ -67,17 +65,10 @@ int main()
 		exit(-1);
 	}
 	else {
-		printf("Message sent. Type = %lu, info = (%d, %d), pid = %d\n", 
+		printf("Message sent. Type = %lu, info = (%d, %d), pid = %d\n",
 				SndBuf.mtype, SndBuf.info.a, SndBuf.info.b,
 				SndBuf.info.pid);
 	}
-
-	/*
-   * Зачем это действия с семафором?
-   */
-	sem_t *sem;
-	sem = sem_open("/my_sem", 0);
-	sem_post(sem);
 
 	printf("	Waiting to recieve...\n");
 
