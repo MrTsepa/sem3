@@ -123,6 +123,13 @@ int main()
 
 		pthread_t thread;
 
+		/*
+		 * FIXIT: У вас rcvBuf - локальная переменная, которая живёт до следующей итерации цикла.
+		 * В pthread_create вы передаёте указатель на временный объект.
+		 * Собственно начинается лотерея, успеет ли нить скопировать во свою локальную переменную то, что вы из главной нити передаёте:
+		 * struct RcvMsg rcvBuf = *((struct RcvMsg*)ptrrcvBuf);
+		 * Надо обойти как-то эту ситуацию.  
+		 */
 		if (pthread_create(&thread, NULL, thread_func, (void*)&rcvBuf) != 0) {
 			return EXIT_FAILURE;
 		}
