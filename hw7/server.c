@@ -33,7 +33,7 @@ struct SndMsg {
 };
 
 void *thread_func(void *ptrrcvBuf)
-{	
+{
 	struct RcvMsg rcvBuf = *((struct RcvMsg*)ptrrcvBuf);
 	printf("Executing task of pid %d.\n", rcvBuf.info.pid);
 
@@ -90,15 +90,15 @@ int main()
 	}
 
 	int semval = semctl(semid, 0, GETVAL);	//
-	semaphore.sem_flg = 0;			// обнуление семафора	
+	semaphore.sem_flg = 0;			// обнуление семафора
 	semaphore.sem_num = 0;			// перед началом работы
 	semaphore.sem_op  = -1*semval;		//
 	semop(semid, &semaphore, 1);		//
-							
-	semaphore.sem_flg = 0;				
-	semaphore.sem_num = 0;				
-	semaphore.sem_op  = MAX_THREAD_NUMBER;		
-	semop(semid, &semaphore, 1);			
+
+	semaphore.sem_flg = 0;
+	semaphore.sem_num = 0;
+	semaphore.sem_op  = MAX_THREAD_NUMBER;
+	semop(semid, &semaphore, 1);
 
 	while(1)
 	{
@@ -123,14 +123,10 @@ int main()
 
 		pthread_t thread;
 
-		/*
-		 * FIXIT: У вас rcvBuf - локальная переменная, которая живёт до следующей итерации цикла.
-		 * В pthread_create вы передаёте указатель на временный объект.
-		 * Собственно начинается лотерея, успеет ли нить скопировать во свою локальную переменную то, что вы из главной нити передаёте:
-		 * struct RcvMsg rcvBuf = *((struct RcvMsg*)ptrrcvBuf);
-		 * Надо обойти как-то эту ситуацию.  
-		 */
-		if (pthread_create(&thread, NULL, thread_func, (void*)&rcvBuf) != 0) {
+		struct RcvMsg *ptrrcvBuf = (struct RcvMsg*)malloc(sizeof(rcvBuf));
+		*ptrrcvBuf = rcvBuf;
+
+		if (pthread_create(&thread, NULL, thread_func, (void*)ptrrcvBuf) != 0) {
 			return EXIT_FAILURE;
 		}
 	}
