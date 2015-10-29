@@ -129,5 +129,7 @@ int main()
 		if (pthread_create(&thread, NULL, thread_func, (void*)ptrrcvBuf) != 0) {
 			return EXIT_FAILURE;
 		}
+
+		free(ptrrcvBuf);
 	}
 }
