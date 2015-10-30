@@ -35,6 +35,7 @@ struct SndMsg {
 void *thread_func(void *ptrrcvBuf)
 {
 	struct RcvMsg rcvBuf = *((struct RcvMsg*)ptrrcvBuf);
+	free(ptrrcvBuf);					// Теперь данные точно успевают скопироваться
 	printf("Executing task of pid %d.\n", rcvBuf.info.pid);
 
 	struct SndMsg sndBuf;
@@ -129,7 +130,5 @@ int main()
 		if (pthread_create(&thread, NULL, thread_func, (void*)ptrrcvBuf) != 0) {
 			return EXIT_FAILURE;
 		}
-
-		free(ptrrcvBuf);
 	}
 }
