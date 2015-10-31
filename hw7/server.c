@@ -124,6 +124,10 @@ int main()
 
 		pthread_t thread;
 
+		/*
+		 * Зачем вам дополнительная переменная? Могли бы сразу выделить rcvBuf в куче.
+		 * В целом, нормально. Засчитано. 
+		 */
 		struct RcvMsg *ptrrcvBuf = (struct RcvMsg*)malloc(sizeof(rcvBuf));
 		*ptrrcvBuf = rcvBuf;
 
