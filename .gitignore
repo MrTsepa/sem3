@@ -10,3 +10,5 @@ ex1.c
 hw7/temp.txt
 
 temp.txt
+
+*.swp
