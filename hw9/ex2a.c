@@ -7,11 +7,16 @@
 
 char* find_file(char * cur_dir, int depth, const char * name)
 {
+  printf("%s\n", cur_dir);
 	DIR * dirp = opendir(cur_dir);
 	struct dirent * dp = (struct dirent *)malloc(sizeof(struct dirent));
 	while ((dp = readdir(dirp)) != NULL) {
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, ".."))
 			continue;
+    /*
+     * FIXIT:
+     * Все магические числа вроде 1024, 4 необходимо вынести в отдельные константы.
+     */
 		char * temp_cur_dir = (char*)malloc(sizeof(char) * 1024);
 		strcpy(temp_cur_dir, cur_dir);
 		if (!strcmp(dp->d_name, name) && (dp->d_type != 4)) {
@@ -26,9 +31,20 @@ char* find_file(char * cur_dir, int depth, const char * name)
 			free(temp_cur_dir);
 		}
 	}
+	/*
+   * зачем вам выделять память под переменную dp.
+   * Насколько я помню в документации написано, итак есть уже некоторая переменная, в которую readdir записывает данные о новом inode`е.
+   * Даже, если я и ошибаюсь, то структура dirent небольшая и её вполне можно выделить и на стеке:
+   * struct dirent dp;
+   * Это работает быстрее (хотя здесь не принципиально) + не надо помнить об освобождении памяти.
+   */
 	free(dp);
 	return NULL;
 }
+
+/*
+ * Поправьте по крайней мере магические числа и засчитаем
+ */
 
 int main(int argc, char* argv[])
 {
