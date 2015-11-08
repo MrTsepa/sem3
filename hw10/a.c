@@ -7,13 +7,23 @@
 
 pid_t ppid, chpid;
 
-char * str = "abacaba";
+/*
+ * У вас переменная ppid не инициализирована. В debug режиме ей присваивается значение 0.
+ * Написав kill(0, ...) вы отправляете сигнал всем процессам в рабочей группе (мы пропустили это на семинаре, сказав, что общаются только родственные процессы).
+ * Т.е. с большой вероятностью процесс сам себе что-то отправлял.
+ */
+
+char * str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 char ** str_res_ptr;
 
 char cur_char = 0;
 int pos_in_char = 0;
 int pos_in_str = 0;
 
+/*
+ * Зачем вам эта ф-я?
+ * Можно ведь написать 1 << p.
+ */
 char pwr_of_2(int p)
 {
 	int i;
@@ -52,14 +62,19 @@ int main()
 	str_res_ptr = (char**)malloc(sizeof(char*));
 	*str_res_ptr = (char*)malloc(sizeof(char)*strlen(str));
 	pid_t pid = fork();
+/*
+ * Зачем разводить магические числа на ровном месте. Даже в задании написано, что сигналы
+ * называются SIGUSR1, SIGUSR2. Зачем вам тогда 30 и 31.
+ */
 	signal(30, handler);
 	signal(31, handler);
+  
 	if (pid != 0) {
 		int i;
 		for (i = 0; i < strlen(str); i++) {
 			int j;
 			char c = str[i];
-			for (j = 0; j < sizeof(char)*8; j++) {
+			for (j = 0; j < sizeof(char) * 8; j++) {
 				int flag = c % 2;
 				if (flag == 0) {
 					kill(ppid, 30);
