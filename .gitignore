@@ -1,16 +1,10 @@
 
 *.out
 
-a.c
-
-ex0.c
-
-ex1.c
 
 hw7/temp.txt
-
-temp.txt
 
 *.swp
 
 cw10/*
+hw10/b.c
