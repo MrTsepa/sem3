@@ -7,7 +7,7 @@
 
 pid_t ppid, chpid;
 
-char * str =	 "Hello, world!";
+char * str = "abacaba";
 char ** str_res_ptr;
 
 char cur_char = 0;
@@ -42,6 +42,7 @@ void handler(int nsig) {
 		pos_in_str++;
 	}
 	if (pos_in_str == strlen(str)) {
+		str_res[pos_in_str] = '\0';
 		printf("%s\n", str_res);
 	}
 }
