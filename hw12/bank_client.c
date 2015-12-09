@@ -45,10 +45,8 @@ int main(int argc, char **argv)
 	int current_bank_balance = 0;
 	int sockfd = establish_connection(argc, argv);
 	printf("Connection established\n");
-	int n;
-	int i;
-	char sendline[1000], recvline[1000];
-	bzero(sendline, 1000);
+	int n, i;
+	char recvline[1000];
 	bzero(recvline, 1000);
 	while(1) {
 		int request;

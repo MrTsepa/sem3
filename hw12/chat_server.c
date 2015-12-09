@@ -17,19 +17,33 @@ int semid;
 
 struct sembuf semaphore;
 
-int sockfd, viewer_sockfd;
+int sockfd, view_sockfd;
+int viewer_sockfd[1000];
+int viewer_count = 0;
 int establish_connection(int argc, char** argv);
 
 void *thread_func()
 {
 	int n;
+	int viewer_id = viewer_count;
+	viewer_count++;
 	char line[1000];
 	int client_sockfd;
 	struct sockaddr_in cliaddr;
+	struct sockaddr_in viewaddr;
 	socklen_t clilen = sizeof(cliaddr);
 	if ((client_sockfd = accept(sockfd, 
 			(struct sockaddr*) &cliaddr, 
 			&clilen)) < 0) {
+		perror(NULL);
+		close(sockfd);
+		exit(1);
+	}
+
+	socklen_t viewlen = sizeof(viewaddr);
+	if ((viewer_sockfd[viewer_id] = accept(view_sockfd, 
+			(struct sockaddr*) &viewaddr, 
+			&viewlen)) < 0) {
 		perror(NULL);
 		close(sockfd);
 		exit(1);
@@ -47,7 +61,10 @@ void *thread_func()
 		strcat(str, login);
 		strcat(str, "]: ");
 		strcat(str, line);
-		write(viewer_sockfd, str, strlen(str) + 1);
+		int i;
+		for(i = 0; i < viewer_count; i++) {
+			write(viewer_sockfd[i], str, strlen(str) + 1);
+		}
 	}
 	if (n < 0) {
 		perror(NULL);
@@ -94,7 +111,6 @@ int main(int argc, char **argv)
 	}
 
 	struct sockaddr_in viewaddr;
-	int view_sockfd;
 
 	if((view_sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		perror(NULL);
@@ -114,15 +130,6 @@ int main(int argc, char **argv)
 	}
 
 	if (listen(view_sockfd, 5) < 0) {
-		perror(NULL);
-		close(sockfd);
-		exit(1);
-	}
-
-	socklen_t viewlen = sizeof(viewaddr);
-	if ((viewer_sockfd = accept(view_sockfd, 
-			(struct sockaddr*) &viewaddr, 
-			&viewlen)) < 0) {
 		perror(NULL);
 		close(sockfd);
 		exit(1);
@@ -164,36 +171,4 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
-}
-
-int establish_connection(int argc, char** argv) 
-{
-	int sockfd;
-	struct sockaddr_in servaddr;
-	if (argc != 2) {
-		printf("Usage: a.out <IP adress>\n");
-		exit(1);
-	}
-
-	if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-		perror(NULL);
-		exit(1);
-	}
-
-	bzero(&servaddr, sizeof(servaddr));
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(51001);
-	if (inet_aton(argv[1], &servaddr.sin_addr) == 0) {
-		printf("Invalid IP address\n");
-		close(sockfd);
-		exit(1);
-	}
-
-	if (connect(sockfd, (struct sockaddr *) &servaddr, 
-				sizeof(servaddr)) < 0) {
-		perror(NULL);
-		close(sockfd);
-		exit(1);
-	}
-	return sockfd;
 }
