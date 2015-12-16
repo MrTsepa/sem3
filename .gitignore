@@ -1,6 +1,7 @@
 
 *.out
 
+*.un~
 
 hw7/temp.txt
 
