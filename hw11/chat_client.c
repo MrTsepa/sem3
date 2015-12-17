@@ -30,6 +30,12 @@ int establish_connection(int argc, char** argv)
 	return sockfd;
 }
 
+/*
+ * Сделайте без отдельного viewer`а.
+ * Пусть клиент создаст две нити: первая для чтения с консоли и отправки сообщений, 
+ * а вторая для чтения из сокета и вывода сообщений на экран.
+ */
+
 int main(int argc, char **argv)
 {
 	int sockfd = establish_connection(argc, argv);
