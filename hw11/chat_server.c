@@ -15,6 +15,15 @@
 // Не смог придумать как реализовать viewer на стороне пользователя,
 // так как непонятно как хранить адреса всех подключенных клиентов.
 
+int sockaddr_incmp(struct sockaddr_in addr1, struct sockaddr_in addr2)
+{
+	if ((addr1.sin_family == addr2.sin_family) &&
+		(addr1.sin_port == addr2.sin_port) &&
+		(addr1.sin_addr.s_addr == addr2.sin_addr.s_addr)) 
+		return 0;
+	else return 1;
+}
+
 int main(int argc, char **argv)
 {
 	int sockfd;
@@ -37,9 +46,30 @@ int main(int argc, char **argv)
 		close(sockfd);
 		exit(1);
 	}
+	
+	struct sockaddr_in clientaddr_arr[1000];
+	int client_number = 0;
 
 	while(1) {
-		recvfrom(sockfd, recvline, LINE_SIZE, 0, NULL, NULL);
-		printf(recvline);
+		struct sockaddr_in temp_addr;
+		socklen_t temp_addr_len = sizeof(temp_addr);
+		recvfrom(sockfd, recvline, LINE_SIZE, 0, (struct sockaddr*)&temp_addr, &temp_addr_len);
+		int i;
+		int flag = 0;
+		for (i = 0; i < client_number; i++) {
+			if(sockaddr_incmp(temp_addr, clientaddr_arr[i]) == 0) {
+				flag = 1;
+			}
+		}
+		if (flag == 0) {
+			clientaddr_arr[client_number] = temp_addr;
+			client_number++;
+			printf("%d\n", client_number);
+		}
+		for (i = 0; i < client_number; i++) {
+			sendto(sockfd, recvline, strlen(recvline)+1, 0,
+					(struct sockaddr*)&clientaddr_arr[i], sizeof(clientaddr_arr[i]));
+		}
+		printf("%s", recvline);
 	}
 }
